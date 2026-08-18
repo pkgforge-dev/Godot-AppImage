@@ -7,7 +7,7 @@
 [![Latest Stable Release](https://img.shields.io/github/v/release/pkgforge-dev/Godot-AppImage)](https://github.com/pkgforge-dev/Godot-AppImage/releases/latest)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/godotengine/godot/refs/heads/master/icon.png" width="128" />
+  <img src="https://raw.githubusercontent.com/godotengine/godot/refs/heads/master/misc/logo/icon.png" width="128" />
 </p>
 
 
