@@ -8,7 +8,7 @@ export ARCH VERSION
 export OUTPATH=./dist
 export ADD_HOOKS="self-updater.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export ICON=/usr/share/pixmaps/godot.svg
+export ICON=/usr/share/icons/hicolor/256x256/apps/godot.png
 export DESKTOP=/usr/share/applications/org.godotengine.Godot.desktop
 export DEPLOY_OPENGL=1
 
