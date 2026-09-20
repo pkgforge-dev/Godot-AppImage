@@ -1,6 +1,9 @@
 # Build Godot for the x86_64 baseline (SSE2) instead of requiring SSE4.2 and
 # POPCNT, so the resulting binary also runs on older 64-bit CPUs.
 #
+# The engine also has a hardcoded SSE4.2 runtime check in main(), which must be
+# disabled when the binary is built without -msse4.2.
+#
 # Based on the same change carried by Gentoo:
 # https://github.com/gentoo/gentoo/blob/master/dev-games/godot/files/godot-4.5-scons.patch
 --- a/SConstruct
@@ -14,3 +17,14 @@
  elif env["arch"] == "x86_32":
      # Be more conservative with instruction sets on 32-bit x86 to improve compatibility.
      # SSE and SSE2 are present on all CPUs that support 64-bit, even if running a 32-bit OS.
+--- a/platform/linuxbsd/godot_linuxbsd.cpp
++++ b/platform/linuxbsd/godot_linuxbsd.cpp
+@@ -68,7 +68,7 @@
+ #endif
+ 
+ int main(int argc, char *argv[]) {
+-#if defined(__x86_64) || defined(__x86_64__)
++#if (defined(__x86_64) || defined(__x86_64__)) && defined(__SSE4_2__)
+ 	int cpuinfo[4];
+ 	__cpuid(cpuinfo, 0x01);
+ 
