@@ -1,0 +1,16 @@
+# Build Godot for the x86_64 baseline (SSE2) instead of requiring SSE4.2 and
+# POPCNT, so the resulting binary also runs on older 64-bit CPUs.
+#
+# Based on the same change carried by Gentoo:
+# https://github.com/gentoo/gentoo/blob/master/dev-games/godot/files/godot-4.5-scons.patch
+--- a/SConstruct
++++ b/SConstruct
+@@ -802,7 +802,7 @@
+         env.Append(CCFLAGS=["/d2archSSE42"])
+     else:
+         # `-msse2` is implied when compiling for x86_64.
+-        env.Append(CCFLAGS=["-msse4.2", "-mpopcnt"])
++        pass
+ elif env["arch"] == "x86_32":
+     # Be more conservative with instruction sets on 32-bit x86 to improve compatibility.
+     # SSE and SSE2 are present on all CPUs that support 64-bit, even if running a 32-bit OS.
