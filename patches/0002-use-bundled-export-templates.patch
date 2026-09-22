@@ -1,0 +1,24 @@
+# Make the editor prefer export templates bundled next to the executable
+# (AppImage: $APPDIR/share/godot/export_templates), so exported games use the
+# patched templates shipped in the AppImage instead of the official SSE4.2-only
+# ones. Falls back to the user data dir for platforms the AppImage does not
+# ship templates for.
+--- a/editor/export/editor_export_platform.cpp
++++ b/editor/export/editor_export_platform.cpp
+@@ -596,6 +596,16 @@
+ 
+ String EditorExportPlatform::find_export_template(const String &template_file_name, String *err) const {
+ 	String current_version = GODOT_VERSION_FULL_CONFIG;
++
++	// Prefer templates bundled next to the executable (e.g. AppImage), they are
++	// built and patched for this AppImage. Falls back to the user data dir, so
++	// other platforms can still use officially installed templates.
++	String bundled_dir = OS::get_singleton()->get_executable_path().get_base_dir().path_join("../share/godot/export_templates").simplify_path();
++	String bundled_path = bundled_dir.path_join(current_version).path_join(template_file_name);
++	if (FileAccess::exists(bundled_path)) {
++		return bundled_path;
++	}
++
+ 	String template_path = EditorPaths::get_singleton()->get_export_templates_dir().path_join(current_version).path_join(template_file_name);
+ 
+ 	if (FileAccess::exists(template_path)) {
