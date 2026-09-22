@@ -44,7 +44,7 @@ git clone --filter=blob:none --no-checkout https://github.com/godotengine/godot 
 	# Build the latest stable release
 	TAG=$(git tag --list '*-stable' --sort=-v:refname | head -n 1)
 	git checkout "$TAG"
-	VERSION="${TAG%-stable}"
+	VERSION=${TAG%-stable}
 	echo "$VERSION" > ~/version
 
 	# Allow the engine to run on CPUs without SSE4.2 and POPCNT
@@ -89,22 +89,27 @@ read -r _ver < ~/version
 # Export templates are standalone binaries, they are not made portable by
 # bundling glibc in the AppImage like the editor is, so polyfill them to run
 # against an older glibc (Ubuntu 22.04's 2.35)
-templates=/usr/share/godot/export_templates/"${_ver}".stable
+templates=/usr/share/godot/export_templates/${_ver}.stable
 mkdir -p "$templates"
 
-cp -v ./godot/bin/godot.linuxbsd.template_release.* "$templates"/linux_release.x86_64
-cp -v ./godot/bin/godot.linuxbsd.template_debug.*   "$templates"/linux_debug.x86_64
+# Godot's arch name differs from uname -m on aarch64
+set -- ./godot/bin/godot.linuxbsd.template_release.*
+farch=${1##*.}
+_release=$templates/linux_release.$farch
+_debug=$templates/linux_debug.$farch
+
+cp -v "$1" "$_release"
+cp -v ./godot/bin/godot.linuxbsd.template_debug.* "$_debug"
 
 echo "Making export templates compatible with older glibc..."
 echo "---------------------------------------------------------------"
 ./polyfill-glibc/polyfill-glibc \
-	--target-glibc=2.35                \
-	"$templates"/linux_release.x86_64  \
-	"$templates"/linux_debug.x86_64
+	--target-glibc=2.35 \
+	"$_release" "$_debug"
 
 # The templates are ELF binaries but Godot only reads/copies them, so drop the
 # executable bit to prevent quick-sharun from deploying them as binaries
-chmod 644 "$templates"/linux_release.x86_64 "$templates"/linux_debug.x86_64
+chmod 644 "$_release" "$_debug"
 
 mkdir -p ./AppDir
 cp -v ./godot/bin/godot.linuxbsd.editor.*    /usr/bin/godot
